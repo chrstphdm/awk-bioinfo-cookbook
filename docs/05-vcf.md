@@ -373,6 +373,14 @@ from the per-sample genotype columns.
 - Multi-allelic sites: any non-`0` allele index is counted as ALT. For per-allele AF on
   multi-allelic sites, check the allele index and count per value.
 
+!!! warning "AF on multi-allelic sites is aggregated, not per-allele"
+    A genotype `1/2` contributes 2 ALT alleles to the total ALT count, but this recipe
+    does not distinguish between allele 1 and allele 2. The resulting AF is the
+    **combined non-reference frequency**, not the frequency of a specific alternate
+    allele. For per-allele AF, split multi-allelic sites first (see
+    [Handle multi-allelic sites](#handle-multi-allelic-sites)) then compute AF on each
+    biallelic record separately.
+
 ### Variants
 
 ```awk
