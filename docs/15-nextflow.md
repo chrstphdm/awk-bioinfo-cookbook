@@ -104,21 +104,31 @@ inside the AWK program ends the Groovy string prematurely.
     'awk \'/^#/ || $7 == "PASS"\' ' + vcf + ' > pass_only.vcf'
     ```
 
-=== "External script file"
+=== "External `.awk` file (recommended for >5 lines)"
 
-    Place the AWK program in a `bin/` script file or pass it via `-f`:
+    Place the AWK program in a `.awk` file in the pipeline's `bin/` directory and
+    call it with `-f`. This **eliminates all quoting issues** — no `\$` escaping,
+    no triple-quoted strings:
 
     ```nextflow
-    // bin/filter_pass.awk is committed to the repo
+    // bin/filter_pass.awk is committed to the pipeline repo
     script:
     """
-    awk -f ${projectDir}/bin/filter_pass.awk ${vcf} > pass_only.vcf
+    awk -v min_qual=${params.min_qual} \
+        -f ${projectDir}/bin/filter_pass.awk \
+        ${vcf} > pass_only.vcf
     """
     ```
 
+    - Zero quoting conflicts — AWK code is plain AWK, Nextflow code is plain Nextflow
     - Clean separation of AWK logic and Nextflow plumbing
-    - Easier to test the AWK script independently
-    - **Good choice when the AWK script is longer than ~10 lines**
+    - Easier to test the AWK script independently (`awk -f bin/filter_pass.awk test.vcf`)
+    - Version-controlled alongside the pipeline
+    - Reusable across multiple processes
+    - **Recommended when the AWK script is longer than ~5 lines**
+
+    See [Fundamentals → AWK script files](01-fundamentals.md#awk-script-files-awk) for
+    naming conventions (`.awk` vs `.gawk`), shebang lines, and the `-f` flag.
 
 ---
 
