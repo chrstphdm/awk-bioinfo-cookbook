@@ -171,3 +171,69 @@ $3 == "gene" {
 - GFF3 uses `key=value` pairs; GTF uses `key "value"` pairs with quotes.
 - The loop approach works with any AWK; the `match()` capture approach requires gawk.
 - `gsub(/^ +/, "", attrs[i])` strips leading spaces that appear after a semicolon split.
+
+!!! note "GTF in depth"
+    GTF (the format used by RNA-seq tools like STAR, featureCounts, StringTie) has a
+    more complex attribute structure and a gene → transcript → exon hierarchy.
+    See [GTF Annotation](11-gtf.md) for a dedicated chapter.
+
+---
+
+## Merge overlapping BED intervals
+
+### Context
+
+Before computing total coverage, overlapping intervals from the same chromosome must
+be merged — otherwise a position covered by two overlapping features is counted twice.
+
+!!! warning "Input must be sorted"
+    This recipe assumes the BED file is sorted by chromosome then start position.
+    Sort first: `sort -k1,1 -k2,2n regions.bed | awk -f merge_bed.awk`
+
+### Code
+
+```awk
+# Usage: sort -k1,1 -k2,2n regions.bed | awk -f merge_bed.awk
+# Merges overlapping/adjacent intervals on the same chromosome
+
+/^#/ { print; next }
+
+FNR == 1 {
+    chrom = $1; start = $2; end = $3
+    next
+}
+
+$1 == chrom && $2 <= end {
+    # Overlapping or adjacent: extend current interval if needed
+    if ($3 > end) end = $3
+    next
+}
+
+{
+    # New chromosome or non-overlapping interval: emit current, start new
+    print chrom, start, end
+    chrom = $1; start = $2; end = $3
+}
+
+END {
+    if (chrom != "") print chrom, start, end
+}
+```
+
+```bash
+# With OFS for tab-separated output
+sort -k1,1 -k2,2n docs/data/regions.bed \
+  | awk 'BEGIN{OFS="\t"} /^#/{print;next}
+         FNR==1{c=$1;s=$2;e=$3;next}
+         $1==c && $2<=e{if($3>e)e=$3;next}
+         {print c,s,e; c=$1;s=$2;e=$3}
+         END{if(c!="")print c,s,e}'
+```
+
+### Explanation
+
+- The key condition is `$2 <= end`: if the next interval's start is ≤ the current end,
+  they overlap (BED is 0-based half-open, so adjacent intervals have `$2 == end`).
+- `if ($3 > end) end = $3` extends the current merged interval if the new one reaches
+  further right.
+- The `END` block ensures the last accumulated interval is printed.
