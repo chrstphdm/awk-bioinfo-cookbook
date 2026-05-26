@@ -49,7 +49,7 @@ nav:
   - Reports & Aggregation: 08-reports.md
   - Advanced Patterns: 09-advanced.md
   - getline: 10-getline.md
-  - Testing AWK Scripts: 10-testing.md
+  - Testing AWK Scripts: 14-testing.md
   - GTF Annotation: 11-gtf.md
   - RNA-seq Counts: 12-rnaseq.md
   - Multi-sample Patterns: 13-multi-sample.md
