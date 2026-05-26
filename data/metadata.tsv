@@ -1,0 +1,6 @@
+sample_id	batch	sex	population	QC_status
+NA12878	batch1	F	CEU	PASS
+NA19238	batch1	F	YRI	PASS
+NA20585	batch2	M	GIH	PASS
+NA12890	batch2	F	CEU	FAIL
+NA18507	batch3	M	YRI	WARN

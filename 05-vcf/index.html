@@ -1,0 +1,1841 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Practical AWK recipes for bioinformatics — FASTQ, FASTA, VCF, BED, GFF, GTF, RNA-seq counts, multi-sample patterns, and Nextflow integration. Problem-driven, executable on included test data, with POSIX and gawk variants.">
+      
+      
+        <meta name="author" content="Christophe Demay">
+      
+      
+        <link rel="canonical" href="https://chrstphdm.github.io/awk-bioinfo-cookbook/05-vcf/">
+      
+      
+        <link rel="prev" href="../04-bed-gff/">
+      
+      
+        <link rel="next" href="../06-sam-tsv/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>VCF - AWK Bioinformatics Cookbook</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#vcf-recipes" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="AWK Bioinformatics Cookbook" class="md-header__button md-logo" aria-label="AWK Bioinformatics Cookbook" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AWK Bioinformatics Cookbook
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              VCF
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/chrstphdm/awk-bioinfo-cookbook" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    chrstphdm/awk-bioinfo-cookbook
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AWK Bioinformatics Cookbook" class="md-nav__button md-logo" aria-label="AWK Bioinformatics Cookbook" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AWK Bioinformatics Cookbook
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/chrstphdm/awk-bioinfo-cookbook" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    chrstphdm/awk-bioinfo-cookbook
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../00-why-awk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Why AWK?
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-fundamentals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fundamentals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-fastq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FASTQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-fasta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FASTA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04-bed-gff/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BED / GFF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VCF
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VCF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#skip-header-lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Skip header lines
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Skip header lines">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filter-variants-by-qual-score" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter variants by QUAL score
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Filter variants by QUAL score">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#context_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#code_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filter-by-filter-column" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filter by FILTER column
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Filter by FILTER column">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#context_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#code_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extract-a-field-from-the-info-column" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extract a field from the INFO column
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Extract a field from the INFO column">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#context_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#code_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#count-variants-per-chromosome" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Count variants per chromosome
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Count variants per chromosome">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#context_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#code_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variants
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extract-per-sample-genotype-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extract per-sample genotype fields
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Extract per-sample genotype fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#context_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#code_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variants_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variants
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#handle-multi-allelic-sites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Handle multi-allelic sites
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Handle multi-allelic sites">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#context_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#code_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variants_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variants
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compute-allele-frequency-from-genotypes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compute allele frequency from genotypes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Compute allele frequency from genotypes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#context_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#code_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variants_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variants
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extract-ann-annotation-field-snpeff-vep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extract ANN annotation field (SnpEff / VEP)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Extract ANN annotation field (SnpEff / VEP)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#context_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#code_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explanation_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Explanation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variants_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variants
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-sam-tsv/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SAM-derived TSV
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07-joins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Two-file Joins
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08-reports/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reports & Aggregation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09-advanced/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10-getline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    getline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../11-gtf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GTF Annotation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../12-rnaseq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RNA-seq Counts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../13-multi-sample/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-sample Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../14-testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing AWK Scripts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../15-nextflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AWK in Nextflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../16-workflows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Test Data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="vcf-recipes">VCF Recipes</h1>
+<p>VCF (Variant Call Format) has a variable-length header block (lines starting with <code>##</code>
+or <code>#CHROM</code>) followed by one variant per line with 8 fixed columns plus per-sample columns.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>#CHROM  POS  ID  REF  ALT  QUAL  FILTER  INFO  [FORMAT  SAMPLE...]
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Test data</p>
+<p>All recipes on this page work with <a href="../data/"><code>docs/data/variants.vcf</code></a>:
+20 variants across chr1/chr2, 3 samples (NA12878, NA19238, NA20585), FORMAT <code>GT:DP:GQ:AD</code>,
+includes SNPs, INDELs, multi-allelic sites, PASS/LowQual filters, and SnpEff ANN annotations.</p>
+</div>
+<hr />
+<h2 id="skip-header-lines">Skip header lines</h2>
+<h3 id="context">Context</h3>
+<p>VCF headers contain metadata (<code>##</code>) and the sample name line (<code>#CHROM</code>).
+Most AWK processing needs to skip or handle them separately.</p>
+<h3 id="code">Code</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Skip all header lines</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="p">{</span> <span class="kr">print</span> <span class="o">$</span><span class="mi">1</span><span class="p">,</span> <span class="o">$</span><span class="mi">2</span><span class="p">,</span> <span class="o">$</span><span class="mi">4</span><span class="p">,</span> <span class="o">$</span><span class="mi">5</span> <span class="p">}</span>    <span class="c1"># CHROM, POS, REF, ALT</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Pass headers through, process variant lines</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">print</span><span class="p">;</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Extract sample names from the #CHROM header</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="sr">/^#CHROM/</span> <span class="p">{</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="nb">NF</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="nx">samples</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">$</span><span class="nx">i</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="kr">next</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="explanation">Explanation</h3>
+<ul>
+<li><code>##</code> lines are metadata (format version, contig lengths, INFO/FORMAT definitions).</li>
+<li><code>#CHROM</code> is the column header line — sample names start at column 10.</li>
+<li>Columns 1-8 are fixed; column 9 is the FORMAT definition; columns 10+ are per-sample.</li>
+</ul>
+<hr />
+<h2 id="filter-variants-by-qual-score">Filter variants by QUAL score</h2>
+<h3 id="context_1">Context</h3>
+<p>Remove low-confidence calls. QUAL is column 6; <code>.</code> means missing.</p>
+<h3 id="code_1">Code</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Usage: awk -v min_qual=30 -f filter_qual.awk variants.vcf</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">print</span><span class="p">;</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="o">$</span><span class="mi">6</span> <span class="o">!=</span> <span class="s2">&quot;.&quot;</span> <span class="o">&amp;&amp;</span> <span class="o">$</span><span class="mi">6</span> <span class="o">+</span> <span class="mi">0</span> <span class="o">&gt;=</span> <span class="nx">min_qual</span> <span class="p">{</span> <span class="kr">print</span> <span class="p">}</span>
+</code></pre></div>
+<h3 id="explanation_1">Explanation</h3>
+<ul>
+<li><code>$6 + 0</code> forces numeric comparison — if <code>$6</code> is <code>.</code>, <code>$6 + 0</code> evaluates to 0.</li>
+<li>The explicit <code>$6 != "."</code> guard is clearer and handles the missing-value case
+  independently of the threshold.</li>
+</ul>
+<hr />
+<h2 id="filter-by-filter-column">Filter by FILTER column</h2>
+<h3 id="context_2">Context</h3>
+<p>Keep only variants that passed all filters. FILTER is column 7; <code>PASS</code> means all filters
+passed; <code>.</code> means no filters applied; anything else is a filter name that failed.</p>
+<h3 id="code_2">Code</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Keep PASS variants only</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">print</span><span class="p">;</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="o">$</span><span class="mi">7</span> <span class="o">==</span> <span class="s2">&quot;PASS&quot;</span> <span class="p">{</span> <span class="kr">print</span> <span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Keep PASS and unfiltered (&quot;.&quot;)</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">print</span><span class="p">;</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="o">$</span><span class="mi">7</span> <span class="o">==</span> <span class="s2">&quot;PASS&quot;</span> <span class="o">||</span> <span class="o">$</span><span class="mi">7</span> <span class="o">==</span> <span class="s2">&quot;.&quot;</span> <span class="p">{</span> <span class="kr">print</span> <span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Exclude a specific filter</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">print</span><span class="p">;</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="o">$</span><span class="mi">7</span> <span class="o">!~</span> <span class="sr">/LowQual/</span> <span class="p">{</span> <span class="kr">print</span> <span class="p">}</span>
+</code></pre></div>
+<hr />
+<h2 id="extract-a-field-from-the-info-column">Extract a field from the INFO column</h2>
+<h3 id="context_3">Context</h3>
+<p>INFO (column 8) is a semicolon-separated list of <code>key=value</code> pairs (and flags).
+Extract the value of a specific key — e.g. <code>AF</code> (allele frequency), <code>DP</code> (depth).</p>
+<h3 id="code_3">Code</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Extract AF from INFO</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="p">{</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="nx">n</span> <span class="o">=</span> <span class="kr">split</span><span class="p">(</span><span class="o">$</span><span class="mi">8</span><span class="p">,</span> <span class="nx">info_fields</span><span class="p">,</span> <span class="s2">&quot;;&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>    <span class="nx">af</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="nx">n</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>        <span class="k">if</span> <span class="p">(</span><span class="kr">split</span><span class="p">(</span><span class="nx">info_fields</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">kv</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">&amp;&amp;</span> <span class="nx">kv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;AF&quot;</span><span class="p">)</span> <span class="p">{</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>            <span class="nx">af</span> <span class="o">=</span> <span class="nx">kv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>            <span class="k">break</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>        <span class="p">}</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>    <span class="p">}</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>    <span class="kr">print</span> <span class="o">$</span><span class="mi">1</span><span class="p">,</span> <span class="o">$</span><span class="mi">2</span><span class="p">,</span> <span class="o">$</span><span class="mi">4</span><span class="p">,</span> <span class="o">$</span><span class="mi">5</span><span class="p">,</span> <span class="nx">af</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>gawk version — more concise:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="p">{</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="kr">match</span><span class="p">(</span><span class="o">$</span><span class="mi">8</span><span class="p">,</span> <span class="sr">/AF=([^;]+)/</span><span class="p">,</span> <span class="nx">arr</span><span class="p">)</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="kr">print</span> <span class="o">$</span><span class="mi">1</span><span class="p">,</span> <span class="o">$</span><span class="mi">2</span><span class="p">,</span> <span class="o">$</span><span class="mi">4</span><span class="p">,</span> <span class="o">$</span><span class="mi">5</span><span class="p">,</span> <span class="p">(</span><span class="nx">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="o">?</span> <span class="nx">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">:</span> <span class="s2">&quot;.&quot;</span><span class="p">)</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="explanation_2">Explanation</h3>
+<ul>
+<li>The loop version works with any AWK; the <code>match()</code> version requires gawk.</li>
+<li><code>match($8, /AF=([^;]+)/, arr)</code> captures everything between <code>AF=</code> and the next <code>;</code>
+  (or end of string) into <code>arr[1]</code>.</li>
+<li>Flags (INFO entries without <code>=</code>) are skipped by the <code>split(...) == 2</code> check.</li>
+</ul>
+<hr />
+<h2 id="count-variants-per-chromosome">Count variants per chromosome</h2>
+<h3 id="context_4">Context</h3>
+<p>Quick summary: how many variants on each chromosome?</p>
+<h3 id="code_4">Code</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="p">{</span> <span class="nx">counts</span><span class="p">[</span><span class="o">$</span><span class="mi">1</span><span class="p">]</span><span class="o">++</span> <span class="p">}</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="nb">END</span> <span class="p">{</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">chrom</span> <span class="o">in</span> <span class="nx">counts</span><span class="p">)</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>        <span class="kr">print</span> <span class="nx">chrom</span><span class="p">,</span> <span class="nx">counts</span><span class="p">[</span><span class="nx">chrom</span><span class="p">]</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Sorted output</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>awk<span class="w"> </span><span class="s1">&#39;/^#/{next} {c[$1]++} END{for(k in c) print k, c[k]}&#39;</span><span class="w"> </span>variants.vcf<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="p">|</span><span class="w"> </span>sort<span class="w"> </span>-V<span class="w"> </span>-k1,1
+</code></pre></div>
+<h3 id="variants">Variants</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Count by variant type (SNP vs INDEL)</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="p">{</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    <span class="nx">is_indel</span> <span class="o">=</span> <span class="p">(</span><span class="kr">length</span><span class="p">(</span><span class="o">$</span><span class="mi">4</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span> <span class="o">||</span> <span class="kr">length</span><span class="p">(</span><span class="o">$</span><span class="mi">5</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>    <span class="nx">type</span> <span class="o">=</span> <span class="nx">is_indel</span> <span class="o">?</span> <span class="s2">&quot;INDEL&quot;</span> <span class="o">:</span> <span class="s2">&quot;SNP&quot;</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>    <span class="nx">counts</span><span class="p">[</span><span class="o">$</span><span class="mi">1</span><span class="p">][</span><span class="nx">type</span><span class="p">]</span><span class="o">++</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="p">}</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="nb">END</span> <span class="p">{</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">c</span> <span class="o">in</span> <span class="nx">counts</span><span class="p">)</span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>        <span class="kr">print</span> <span class="nx">c</span><span class="p">,</span> <span class="nx">counts</span><span class="p">[</span><span class="nx">c</span><span class="p">][</span><span class="s2">&quot;SNP&quot;</span><span class="p">]</span><span class="o">+</span><span class="mi">0</span><span class="p">,</span> <span class="nx">counts</span><span class="p">[</span><span class="nx">c</span><span class="p">][</span><span class="s2">&quot;INDEL&quot;</span><span class="p">]</span><span class="o">+</span><span class="mi">0</span>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="explanation_3">Explanation</h3>
+<ul>
+<li><code>counts[$1]++</code> uses the chromosome name as array key.</li>
+<li>SNP vs INDEL: a substitution is SNP if both REF and ALT are exactly 1 character long.
+  Multi-allelic sites (<code>ALT</code> contains <code>,</code>) are not handled here — add a <code>split($5, alts, ",")</code>
+  loop for strict classification.</li>
+</ul>
+<hr />
+<h2 id="extract-per-sample-genotype-fields">Extract per-sample genotype fields</h2>
+<h3 id="context_5">Context</h3>
+<p>VCF column 9 (FORMAT) defines the field order for each sample column (e.g. <code>GT:DP:GQ:AD</code>).
+Columns 10+ contain per-sample data in that same colon-delimited order.
+To extract <code>GT</code>, <code>DP</code>, or <code>GQ</code> you must first parse FORMAT to find each field's position,
+then index into each sample column accordingly.
+The FORMAT field can vary between variants — do not assume a fixed position.</p>
+<h3 id="code_5">Code</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Usage: awk -f genotypes.awk variants.vcf</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="c1"># Output: CHROM POS SAMPLE GT DP GQ</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="sr">/^#CHROM/</span> <span class="p">{</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="nb">NF</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="nx">sample_names</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">$</span><span class="nx">i</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>    <span class="kr">next</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="p">}</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="p">{</span>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>    <span class="c1"># Find index of GT, DP, GQ in FORMAT (col 9)</span>
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>    <span class="nx">n</span> <span class="o">=</span> <span class="kr">split</span><span class="p">(</span><span class="o">$</span><span class="mi">9</span><span class="p">,</span> <span class="nx">fmt</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>    <span class="nx">gt_idx</span> <span class="o">=</span> <span class="nx">dp_idx</span> <span class="o">=</span> <span class="nx">gq_idx</span> <span class="o">=</span> <span class="mi">0</span>
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="nx">n</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a>        <span class="k">if</span> <span class="p">(</span><span class="nx">fmt</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;GT&quot;</span><span class="p">)</span> <span class="nx">gt_idx</span> <span class="o">=</span> <span class="nx">i</span>
+<a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a>        <span class="k">if</span> <span class="p">(</span><span class="nx">fmt</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;DP&quot;</span><span class="p">)</span> <span class="nx">dp_idx</span> <span class="o">=</span> <span class="nx">i</span>
+<a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a>        <span class="k">if</span> <span class="p">(</span><span class="nx">fmt</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;GQ&quot;</span><span class="p">)</span> <span class="nx">gq_idx</span> <span class="o">=</span> <span class="nx">i</span>
+<a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a>    <span class="p">}</span>
+<a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a>    <span class="c1"># Emit one row per sample</span>
+<a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">s</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span> <span class="nx">s</span> <span class="o">&lt;=</span> <span class="nb">NF</span><span class="p">;</span> <span class="nx">s</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+<a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a>        <span class="kr">split</span><span class="p">(</span><span class="o">$</span><span class="nx">s</span><span class="p">,</span> <span class="nx">gdata</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a>        <span class="nx">gt</span> <span class="o">=</span> <span class="nx">gt_idx</span> <span class="o">?</span> <span class="nx">gdata</span><span class="p">[</span><span class="nx">gt_idx</span><span class="p">]</span> <span class="o">:</span> <span class="s2">&quot;.&quot;</span>
+<a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a>        <span class="nx">dp</span> <span class="o">=</span> <span class="nx">dp_idx</span> <span class="o">?</span> <span class="nx">gdata</span><span class="p">[</span><span class="nx">dp_idx</span><span class="p">]</span> <span class="o">:</span> <span class="s2">&quot;.&quot;</span>
+<a id="__codelineno-13-23" name="__codelineno-13-23" href="#__codelineno-13-23"></a>        <span class="nx">gq</span> <span class="o">=</span> <span class="nx">gq_idx</span> <span class="o">?</span> <span class="nx">gdata</span><span class="p">[</span><span class="nx">gq_idx</span><span class="p">]</span> <span class="o">:</span> <span class="s2">&quot;.&quot;</span>
+<a id="__codelineno-13-24" name="__codelineno-13-24" href="#__codelineno-13-24"></a>        <span class="kr">print</span> <span class="o">$</span><span class="mi">1</span><span class="p">,</span> <span class="o">$</span><span class="mi">2</span><span class="p">,</span> <span class="nx">sample_names</span><span class="p">[</span><span class="nx">s</span><span class="p">],</span> <span class="nx">gt</span><span class="p">,</span> <span class="nx">dp</span><span class="p">,</span> <span class="nx">gq</span>
+<a id="__codelineno-13-25" name="__codelineno-13-25" href="#__codelineno-13-25"></a>    <span class="p">}</span>
+<a id="__codelineno-13-26" name="__codelineno-13-26" href="#__codelineno-13-26"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="explanation_4">Explanation</h3>
+<ul>
+<li>FORMAT is re-parsed per variant because different variant types can carry different fields
+  (e.g. <code>GT:DP</code> vs <code>GT:DP:GQ:AD</code>). Assuming a fixed column index is a common bug.</li>
+<li><code>gt_idx ? gdata[gt_idx] : "."</code> safely returns <code>.</code> when a field is absent from FORMAT.</li>
+<li><code>split($s, gdata, ":")</code> reuses the <code>gdata</code> array — AWK clears it on each <code>split()</code> call.</li>
+</ul>
+<h3 id="variants_1">Variants</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># Filter: only emit samples with DP &gt;= min_depth</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="c1"># Usage: awk -v min_depth=10 -f genotypes_filter.awk variants.vcf</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="sr">/^#CHROM/</span> <span class="p">{</span> <span class="k">for</span> <span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">10</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;=</span><span class="nb">NF</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="nx">sample_names</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="o">=$</span><span class="nx">i</span><span class="p">;</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="p">{</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>    <span class="nx">n</span> <span class="o">=</span> <span class="kr">split</span><span class="p">(</span><span class="o">$</span><span class="mi">9</span><span class="p">,</span> <span class="nx">fmt</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    <span class="nx">gt_idx</span> <span class="o">=</span> <span class="nx">dp_idx</span> <span class="o">=</span> <span class="mi">0</span>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;=</span><span class="nx">n</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>        <span class="k">if</span> <span class="p">(</span><span class="nx">fmt</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;GT&quot;</span><span class="p">)</span> <span class="nx">gt_idx</span><span class="o">=</span><span class="nx">i</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>        <span class="k">if</span> <span class="p">(</span><span class="nx">fmt</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;DP&quot;</span><span class="p">)</span> <span class="nx">dp_idx</span><span class="o">=</span><span class="nx">i</span>
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>    <span class="p">}</span>
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">s</span><span class="o">=</span><span class="mi">10</span><span class="p">;</span> <span class="nx">s</span><span class="o">&lt;=</span><span class="nb">NF</span><span class="p">;</span> <span class="nx">s</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>        <span class="kr">split</span><span class="p">(</span><span class="o">$</span><span class="nx">s</span><span class="p">,</span> <span class="nx">g</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a>        <span class="nx">dp</span> <span class="o">=</span> <span class="nx">dp_idx</span> <span class="o">?</span> <span class="nx">g</span><span class="p">[</span><span class="nx">dp_idx</span><span class="p">]</span><span class="o">+</span><span class="mi">0</span> <span class="o">:</span> <span class="mi">0</span>
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a>        <span class="k">if</span> <span class="p">(</span><span class="nx">dp</span> <span class="o">&gt;=</span> <span class="nx">min_depth</span><span class="p">)</span>
+<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a>            <span class="kr">print</span> <span class="o">$</span><span class="mi">1</span><span class="p">,</span> <span class="o">$</span><span class="mi">2</span><span class="p">,</span> <span class="nx">sample_names</span><span class="p">[</span><span class="nx">s</span><span class="p">],</span> <span class="p">(</span><span class="nx">gt_idx</span> <span class="o">?</span> <span class="nx">g</span><span class="p">[</span><span class="nx">gt_idx</span><span class="p">]</span> <span class="o">:</span> <span class="s2">&quot;.&quot;</span><span class="p">),</span> <span class="nx">dp</span>
+<a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a>    <span class="p">}</span>
+<a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a><span class="p">}</span>
+</code></pre></div>
+<hr />
+<h2 id="handle-multi-allelic-sites">Handle multi-allelic sites</h2>
+<h3 id="context_6">Context</h3>
+<p>The ALT field can contain multiple comma-separated alleles (<code>A,T</code> or <code>A,T,G</code>).
+Many downstream tools require biallelic records. AWK can split a multi-allelic
+site into one record per ALT allele, or simply flag or skip such sites.</p>
+<h3 id="code_6">Code</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Split multi-allelic sites — emit one line per ALT allele</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">print</span><span class="p">;</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="p">{</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    <span class="nx">n_alts</span> <span class="o">=</span> <span class="kr">split</span><span class="p">(</span><span class="o">$</span><span class="mi">5</span><span class="p">,</span> <span class="nx">alts</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">)</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="k">if</span> <span class="p">(</span><span class="nx">n_alts</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>        <span class="kr">print</span>    <span class="c1"># biallelic: pass through unchanged</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>        <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="nx">n_alts</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>            <span class="o">$</span><span class="mi">5</span> <span class="o">=</span> <span class="nx">alts</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>            <span class="kr">print</span>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>        <span class="p">}</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>    <span class="p">}</span>
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="p">}</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Genotype fields are not updated</p>
+<p>Per-sample GT values like <code>1/2</code> reference allele indices in the original multi-allelic
+record. After splitting, these indices no longer match the new single-ALT line.
+For correct splitting including genotype remapping, use <code>bcftools norm -m -any</code>.
+The AWK recipe above is appropriate for annotation or counting tasks where GT is not needed.</p>
+</div>
+<h3 id="explanation_5">Explanation</h3>
+<ul>
+<li><code>split($5, alts, ",")</code> returns the number of alternate alleles.</li>
+<li>Assigning <code>$5 = alts[i]</code> modifies the field and triggers <code>$0</code> reconstruction with <code>OFS</code>.
+  Ensure <code>OFS="\t"</code> is set in <code>BEGIN</code> if you need tab-separated output.</li>
+</ul>
+<h3 id="variants_2">Variants</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># Count multi-allelic sites</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="kr">split</span><span class="p">(</span><span class="o">$</span><span class="mi">5</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="p">{</span> <span class="nx">multi</span><span class="o">++</span> <span class="p">}</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="nb">END</span> <span class="p">{</span> <span class="kr">print</span> <span class="s2">&quot;Multi-allelic sites:&quot;</span><span class="p">,</span> <span class="nx">multi</span><span class="o">+</span><span class="mi">0</span> <span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Skip multi-allelic sites entirely</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">print</span><span class="p">;</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="o">$</span><span class="mi">5</span> <span class="o">!~</span> <span class="sr">/,/</span> <span class="p">{</span> <span class="kr">print</span> <span class="p">}</span>
+</code></pre></div>
+<hr />
+<h2 id="compute-allele-frequency-from-genotypes">Compute allele frequency from genotypes</h2>
+<h3 id="context_7">Context</h3>
+<p>The INFO <code>AF</code> field is set by the variant caller and may not reflect the actual allele
+frequency in a subset of samples (e.g. after subsetting a cohort). Recompute AF directly
+from the per-sample genotype columns.</p>
+<h3 id="code_7">Code</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># Output: CHROM POS REF ALT AF_computed N_missing</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="sr">/^#CHROM/</span> <span class="p">{</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">10</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;=</span><span class="nb">NF</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="nx">sample_names</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="o">=$</span><span class="nx">i</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>    <span class="kr">next</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="p">}</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="p">{</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>    <span class="c1"># Find GT field index in FORMAT</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>    <span class="nx">n</span> <span class="o">=</span> <span class="kr">split</span><span class="p">(</span><span class="o">$</span><span class="mi">9</span><span class="p">,</span> <span class="nx">fmt</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>    <span class="nx">gt_idx</span> <span class="o">=</span> <span class="mi">0</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;=</span><span class="nx">n</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="nx">fmt</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;GT&quot;</span><span class="p">)</span> <span class="p">{</span> <span class="nx">gt_idx</span><span class="o">=</span><span class="nx">i</span><span class="p">;</span> <span class="k">break</span> <span class="p">}</span>
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a>
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a>    <span class="nx">ref_count</span> <span class="o">=</span> <span class="nx">alt_count</span> <span class="o">=</span> <span class="nx">missing</span> <span class="o">=</span> <span class="mi">0</span>
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">s</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span> <span class="nx">s</span> <span class="o">&lt;=</span> <span class="nb">NF</span><span class="p">;</span> <span class="nx">s</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a>        <span class="kr">split</span><span class="p">(</span><span class="o">$</span><span class="nx">s</span><span class="p">,</span> <span class="nx">gdata</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a>        <span class="nx">gt</span> <span class="o">=</span> <span class="nx">gt_idx</span> <span class="o">?</span> <span class="nx">gdata</span><span class="p">[</span><span class="nx">gt_idx</span><span class="p">]</span> <span class="o">:</span> <span class="s2">&quot;./.&quot;</span>
+<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a>        <span class="kr">gsub</span><span class="p">(</span><span class="sr">/\|/</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="nx">gt</span><span class="p">)</span>          <span class="c1"># normalise phased (0|1) → unphased (0/1)</span>
+<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a>        <span class="nx">n_alleles</span> <span class="o">=</span> <span class="kr">split</span><span class="p">(</span><span class="nx">gt</span><span class="p">,</span> <span class="nx">alleles</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">)</span>
+<a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a>        <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="nx">n_alleles</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+<a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a>            <span class="k">if</span>      <span class="p">(</span><span class="nx">alleles</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="nx">missing</span><span class="o">++</span>
+<a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a>            <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">alleles</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span> <span class="nx">ref_count</span><span class="o">++</span>
+<a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a>            <span class="k">else</span>                         <span class="nx">alt_count</span><span class="o">++</span>
+<a id="__codelineno-18-23" name="__codelineno-18-23" href="#__codelineno-18-23"></a>        <span class="p">}</span>
+<a id="__codelineno-18-24" name="__codelineno-18-24" href="#__codelineno-18-24"></a>    <span class="p">}</span>
+<a id="__codelineno-18-25" name="__codelineno-18-25" href="#__codelineno-18-25"></a>    <span class="nx">total</span> <span class="o">=</span> <span class="nx">ref_count</span> <span class="o">+</span> <span class="nx">alt_count</span>
+<a id="__codelineno-18-26" name="__codelineno-18-26" href="#__codelineno-18-26"></a>    <span class="nx">af</span> <span class="o">=</span> <span class="p">(</span><span class="nx">total</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="kr">sprintf</span><span class="p">(</span><span class="s2">&quot;%.4f&quot;</span><span class="p">,</span> <span class="nx">alt_count</span> <span class="o">/</span> <span class="nx">total</span><span class="p">)</span> <span class="o">:</span> <span class="s2">&quot;.&quot;</span>
+<a id="__codelineno-18-27" name="__codelineno-18-27" href="#__codelineno-18-27"></a>    <span class="kr">printf</span> <span class="s2">&quot;%s\t%d\t%s\t%s\t%s\t%d\n&quot;</span><span class="p">,</span> <span class="o">$</span><span class="mi">1</span><span class="p">,</span> <span class="o">$</span><span class="mi">2</span><span class="p">,</span> <span class="o">$</span><span class="mi">4</span><span class="p">,</span> <span class="o">$</span><span class="mi">5</span><span class="p">,</span> <span class="nx">af</span><span class="p">,</span> <span class="nx">missing</span>
+<a id="__codelineno-18-28" name="__codelineno-18-28" href="#__codelineno-18-28"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="explanation_6">Explanation</h3>
+<ul>
+<li><code>gsub(/\|/, "/", gt)</code> normalises phased genotypes (<code>0|1</code>) to unphased (<code>0/1</code>) before
+  splitting on <code>/</code>.</li>
+<li>Missing alleles (<code>.</code>) are counted separately and excluded from the AF denominator.</li>
+<li>Multi-allelic sites: any non-<code>0</code> allele index is counted as ALT. For per-allele AF on
+  multi-allelic sites, check the allele index and count per value.</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">AF on multi-allelic sites is aggregated, not per-allele</p>
+<p>A genotype <code>1/2</code> contributes 2 ALT alleles to the total ALT count, but this recipe
+does not distinguish between allele 1 and allele 2. The resulting AF is the
+<strong>combined non-reference frequency</strong>, not the frequency of a specific alternate
+allele. For per-allele AF, split multi-allelic sites first (see
+<a href="#handle-multi-allelic-sites">Handle multi-allelic sites</a>) then compute AF on each
+biallelic record separately.</p>
+</div>
+<h3 id="variants_3">Variants</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Report per-sample heterozygosity rate alongside AF</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="sr">/^#CHROM/</span> <span class="p">{</span> <span class="k">for</span> <span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">10</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;=</span><span class="nb">NF</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="nx">sn</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="o">=$</span><span class="nx">i</span><span class="p">;</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="p">{</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>    <span class="nx">n_het</span> <span class="o">=</span> <span class="nx">n_hom_ref</span> <span class="o">=</span> <span class="nx">n_hom_alt</span> <span class="o">=</span> <span class="nx">n_miss</span> <span class="o">=</span> <span class="mi">0</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>    <span class="nx">n</span> <span class="o">=</span> <span class="kr">split</span><span class="p">(</span><span class="o">$</span><span class="mi">9</span><span class="p">,</span> <span class="nx">fmt</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">);</span> <span class="nx">gt_idx</span><span class="o">=</span><span class="mi">0</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;=</span><span class="nx">n</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="nx">fmt</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;GT&quot;</span><span class="p">)</span> <span class="nx">gt_idx</span><span class="o">=</span><span class="nx">i</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">s</span><span class="o">=</span><span class="mi">10</span><span class="p">;</span> <span class="nx">s</span><span class="o">&lt;=</span><span class="nb">NF</span><span class="p">;</span> <span class="nx">s</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>        <span class="kr">split</span><span class="p">(</span><span class="o">$</span><span class="nx">s</span><span class="p">,</span> <span class="nx">g</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">);</span> <span class="nx">gt</span><span class="o">=</span><span class="nx">g</span><span class="p">[</span><span class="nx">gt_idx</span><span class="p">]</span>
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a>        <span class="kr">gsub</span><span class="p">(</span><span class="sr">/\|/</span><span class="p">,</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="nx">gt</span><span class="p">)</span>
+<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a>        <span class="k">if</span>      <span class="p">(</span><span class="nx">gt</span><span class="o">==</span><span class="s2">&quot;./.&quot;</span><span class="p">)</span>  <span class="nx">n_miss</span><span class="o">++</span>
+<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a>        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">gt</span><span class="o">==</span><span class="s2">&quot;0/0&quot;</span><span class="p">)</span>  <span class="nx">n_hom_ref</span><span class="o">++</span>
+<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a>        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">gt</span><span class="o">~</span><span class="sr">/^[1-9]\/[1-9]$/</span> <span class="o">&amp;&amp;</span> <span class="kr">split</span><span class="p">(</span><span class="nx">gt</span><span class="p">,</span><span class="nx">a</span><span class="p">,</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span> <span class="o">&amp;&amp;</span> <span class="nx">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="nx">a</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="nx">n_hom_alt</span><span class="o">++</span>
+<a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a>        <span class="k">else</span>                 <span class="nx">n_het</span><span class="o">++</span>
+<a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a>    <span class="p">}</span>
+<a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a>    <span class="kr">printf</span> <span class="s2">&quot;%s\t%d\t%d\t%d\t%d\t%d\n&quot;</span><span class="p">,</span> <span class="o">$</span><span class="mi">1</span><span class="p">,</span> <span class="o">$</span><span class="mi">2</span><span class="p">,</span> <span class="nx">n_hom_ref</span><span class="p">,</span> <span class="nx">n_het</span><span class="p">,</span> <span class="nx">n_hom_alt</span><span class="p">,</span> <span class="nx">n_miss</span>
+<a id="__codelineno-19-17" name="__codelineno-19-17" href="#__codelineno-19-17"></a><span class="p">}</span>
+</code></pre></div>
+<hr />
+<h2 id="extract-ann-annotation-field-snpeff-vep">Extract ANN annotation field (SnpEff / VEP)</h2>
+<h3 id="context_8">Context</h3>
+<p>After running SnpEff or VEP, functional annotations are stored in the INFO field as
+<code>ANN=allele|effect|impact|gene_name|gene_id|...</code> (SnpEff) or <code>CSQ=...</code> (VEP), with
+multiple transcripts separated by commas and fields within each transcript separated
+by pipes. Extracting the gene name and consequence class is a common post-annotation step.</p>
+<h3 id="code_8">Code</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># Extract gene name and effect from SnpEff ANN field [gawk]</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="c1"># Output: CHROM POS REF ALT GENE EFFECT IMPACT</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="p">{</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>    <span class="kr">delete</span> <span class="nx">arr</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>    <span class="kr">match</span><span class="p">(</span><span class="o">$</span><span class="mi">8</span><span class="p">,</span> <span class="sr">/ANN=([^;]+)/</span><span class="p">,</span> <span class="nx">arr</span><span class="p">)</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>    <span class="k">if</span> <span class="p">(</span><span class="nx">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="p">{</span>
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a>        <span class="kr">print</span> <span class="o">$</span><span class="mi">1</span><span class="p">,</span> <span class="o">$</span><span class="mi">2</span><span class="p">,</span> <span class="o">$</span><span class="mi">4</span><span class="p">,</span> <span class="o">$</span><span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span>
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a>        <span class="kr">next</span>
+<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a>    <span class="p">}</span>
+<a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a>    <span class="c1"># ANN can have multiple transcripts, comma-separated — use the first</span>
+<a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a>    <span class="nx">n</span> <span class="o">=</span> <span class="kr">split</span><span class="p">(</span><span class="nx">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nx">transcripts</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">)</span>
+<a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a>    <span class="kr">split</span><span class="p">(</span><span class="nx">transcripts</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nx">f</span><span class="p">,</span> <span class="s2">&quot;|&quot;</span><span class="p">)</span>
+<a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a>    <span class="c1"># SnpEff ANN fields: allele|effect|impact|gene_name|gene_id|feature_type|...</span>
+<a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a>    <span class="kr">print</span> <span class="o">$</span><span class="mi">1</span><span class="p">,</span> <span class="o">$</span><span class="mi">2</span><span class="p">,</span> <span class="o">$</span><span class="mi">4</span><span class="p">,</span> <span class="o">$</span><span class="mi">5</span><span class="p">,</span> <span class="nx">f</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="nx">f</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="nx">f</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+<a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a><span class="p">}</span>
+</code></pre></div>
+<p><strong>POSIX version — no <code>match()</code> capture groups:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="p">{</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>    <span class="nx">ann</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>    <span class="nx">n</span> <span class="o">=</span> <span class="kr">split</span><span class="p">(</span><span class="o">$</span><span class="mi">8</span><span class="p">,</span> <span class="nx">info_fields</span><span class="p">,</span> <span class="s2">&quot;;&quot;</span><span class="p">)</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="nx">n</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>        <span class="k">if</span> <span class="p">(</span><span class="kr">substr</span><span class="p">(</span><span class="nx">info_fields</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;ANN=&quot;</span><span class="p">)</span> <span class="p">{</span>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>            <span class="nx">ann</span> <span class="o">=</span> <span class="kr">substr</span><span class="p">(</span><span class="nx">info_fields</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="mi">5</span><span class="p">)</span>
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>            <span class="k">break</span>
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>        <span class="p">}</span>
+<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a>    <span class="p">}</span>
+<a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a>    <span class="k">if</span> <span class="p">(</span><span class="nx">ann</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="p">{</span> <span class="kr">print</span> <span class="o">$</span><span class="mi">1</span><span class="p">,</span> <span class="o">$</span><span class="mi">2</span><span class="p">,</span> <span class="o">$</span><span class="mi">4</span><span class="p">,</span> <span class="o">$</span><span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">;</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a>    <span class="c1"># Use first transcript only</span>
+<a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a>    <span class="nx">n_tx</span> <span class="o">=</span> <span class="kr">split</span><span class="p">(</span><span class="nx">ann</span><span class="p">,</span> <span class="nx">transcripts</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">)</span>
+<a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a>    <span class="kr">split</span><span class="p">(</span><span class="nx">transcripts</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nx">f</span><span class="p">,</span> <span class="s2">&quot;|&quot;</span><span class="p">)</span>
+<a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a>    <span class="kr">print</span> <span class="o">$</span><span class="mi">1</span><span class="p">,</span> <span class="o">$</span><span class="mi">2</span><span class="p">,</span> <span class="o">$</span><span class="mi">4</span><span class="p">,</span> <span class="o">$</span><span class="mi">5</span><span class="p">,</span> <span class="nx">f</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="nx">f</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="nx">f</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+<a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="explanation_7">Explanation</h3>
+<ul>
+<li><code>match($8, /ANN=([^;]+)/, arr)</code> captures everything from <code>ANN=</code> to the next <code>;</code> or
+  end of field. <code>arr[1]</code> holds the full ANN value.</li>
+<li>SnpEff can annotate multiple transcripts per variant: <code>ANN=T|effect1|...,T|effect2|...</code>.
+  The recipe uses the first transcript. For the most severe consequence, sort by impact
+  level (HIGH &gt; MODERATE &gt; LOW &gt; MODIFIER) — typically done with <code>sort -t'|' -k3</code>.</li>
+<li>VEP uses <code>CSQ=</code> instead of <code>ANN=</code> and has a different pipe-separated field order defined
+  in the <code>##CSQ</code> header line. Adjust the field index accordingly.</li>
+</ul>
+<h3 id="variants_4">Variants</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># Count variants by impact level [gawk]</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="sr">/^#/</span> <span class="p">{</span> <span class="kr">next</span> <span class="p">}</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="p">{</span>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>    <span class="kr">delete</span> <span class="nx">arr</span>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>    <span class="kr">match</span><span class="p">(</span><span class="o">$</span><span class="mi">8</span><span class="p">,</span> <span class="sr">/ANN=([^;]+)/</span><span class="p">,</span> <span class="nx">arr</span><span class="p">)</span>
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="kr">next</span>
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a>    <span class="kr">split</span><span class="p">(</span><span class="nx">arr</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nx">tx</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">)</span>
+<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>    <span class="kr">split</span><span class="p">(</span><span class="nx">tx</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nx">f</span><span class="p">,</span> <span class="s2">&quot;|&quot;</span><span class="p">)</span>
+<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a>    <span class="nx">impact</span><span class="p">[</span><span class="nx">f</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span><span class="o">++</span>    <span class="c1"># f[3] = impact: HIGH, MODERATE, LOW, MODIFIER</span>
+<a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="p">}</span>
+<a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="nb">END</span> <span class="p">{</span>
+<a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">imp</span> <span class="o">in</span> <span class="nx">impact</span><span class="p">)</span>
+<a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a>        <span class="kr">print</span> <span class="nx">imp</span><span class="p">,</span> <span class="nx">impact</span><span class="p">[</span><span class="nx">imp</span><span class="p">]</span>
+<a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a><span class="p">}</span>
+</code></pre></div>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://samtools.github.io/hts-specs/VCFv4.3.pdf">VCF specification v4.3 (hts-specs)</a></li>
+<li><a href="https://pcingola.github.io/SnpEff/">SnpEff documentation</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      &copy; 2026 <a href="https://chrstphdm.github.io/">Christophe Demay</a> — Licensed under CC BY 4.0
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://chrstphdm.github.io/" target="_blank" rel="noopener" title="Christophe Demay — Bioinformatics Consultant" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M351.9 280H161c2.9 64.5 17.2 123.9 37.5 167.4 11.4 24.5 23.7 41.8 35.1 52.4 11.2 10.5 18.9 12.2 22.9 12.2s11.7-1.7 22.9-12.2c11.4-10.6 23.7-28 35.1-52.4 20.3-43.5 34.6-102.9 37.5-167.4zm-191-48h190.9c-2.8-64.5-17.1-123.9-37.4-167.4-11.4-24.4-23.7-41.8-35.1-52.4C268.1 1.7 260.4 0 256.4 0s-11.7 1.7-22.9 12.2c-11.4 10.6-23.7 28-35.1 52.4-20.3 43.5-34.6 102.9-37.5 167.4m-48 0c3.5-85.6 25.6-165.1 57.9-217.3C78.7 47.3 10.9 131.2 1.5 232zM1.5 280c9.4 100.8 77.2 184.7 169.3 217.3-32.3-52.2-54.4-131.7-57.9-217.3zm398.4 0c-3.5 85.6-25.6 165.1-57.9 217.3 92.1-32.7 159.9-116.5 169.3-217.3zm111.4-48C501.9 131.2 434.1 47.3 342 14.7c32.3 52.2 54.4 131.7 57.9 217.3z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://www.linkedin.com/in/christophedemay" target="_blank" rel="noopener" title="www.linkedin.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3M135.4 416H69V202.2h66.5V416zM102.2 96a38.5 38.5 0 1 1 0 77 38.5 38.5 0 1 1 0-77m282.1 320h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/chrstphdm" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.indexes", "toc.integrate", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
