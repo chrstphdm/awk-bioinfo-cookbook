@@ -56,7 +56,7 @@ for a full comparison table.
 | Category | Topics |
 |----------|--------|
 | [Why AWK?](00-why-awk.md) | Implementations (gawk/mawk/nawk/bioawk), AWK vs Python vs R, Parquet |
-| [Fundamentals](01-fundamentals.md) | FS/OFS/RS, BEGIN/END, printf, functions, error handling |
+| [Fundamentals](01-fundamentals.md) | FS/OFS/RS, BEGIN/END, printf, `.awk` script files, functions, error handling |
 | [FASTQ](02-fastq.md) | Block navigation (`NR%4`), length filter, dedup, read extraction |
 | [FASTA](03-fasta.md) | Headers, single-line reformat, length filter, rename, N50 |
 | [BED / GFF](04-bed-gff.md) | Feature filter, coordinate conversion, sizes, GFF attributes, interval merge |

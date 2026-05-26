@@ -52,7 +52,7 @@ On most Linux HPC clusters, `awk` is gawk. On macOS, install gawk with `brew ins
 AWK implementations compared, decision matrix (AWK vs Python vs R), Parquet/columnar formats, when AWK becomes the wrong tool.
 
 ### [1. Fundamentals](docs/01-fundamentals.md)
-FS/OFS/RS, BEGIN/END, printf, functions, error handling.
+FS/OFS/RS, BEGIN/END, printf, `.awk` script files, functions, error handling.
 
 ### [2. FASTQ](docs/02-fastq.md)
 Block navigation (`NR%4`), length filter, dedup, read extraction.
