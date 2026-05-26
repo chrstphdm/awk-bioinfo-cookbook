@@ -1,5 +1,10 @@
 site_name: AWK Bioinformatics Cookbook
 site_url: https://chrstphdm.github.io/awk-bioinfo-cookbook
+site_description: >-
+  Practical AWK recipes for bioinformatics — FASTQ, FASTA, VCF, BED, GFF, GTF,
+  RNA-seq counts, multi-sample patterns, and Nextflow integration. Problem-driven,
+  executable on included test data, with POSIX and gawk variants.
+site_author: Christophe Demay
 repo_url: https://github.com/chrstphdm/awk-bioinfo-cookbook
 repo_name: chrstphdm/awk-bioinfo-cookbook
 
