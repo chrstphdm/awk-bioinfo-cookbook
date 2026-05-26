@@ -293,6 +293,121 @@ awk -v passed_file=pass.tsv -v failed_file=fail.tsv -f route.awk input.tsv
 
 ---
 
+## AWK script files (`.awk`)
+
+### Context
+
+One-liners are convenient for quick tasks, but anything beyond 3–4 lines becomes
+hard to read, debug, and share. AWK has a built-in mechanism to load programs from
+files: the `-f` flag.
+
+### Code
+
+**Basic usage — save the program in a file, run it with `-f`:**
+
+```awk
+# filter_qual.awk — filter VCF by QUAL score
+# Usage: awk -v min_qual=30 -f filter_qual.awk variants.vcf
+
+/^#/ { print; next }
+$6 != "." && $6 + 0 >= min_qual { print }
+```
+
+```bash
+awk -v min_qual=30 -f filter_qual.awk variants.vcf > filtered.vcf
+```
+
+**With a shebang — make the file directly executable:**
+
+```awk
+#!/usr/bin/env -S awk -f
+# transcript_lengths.awk — compute spliced transcript lengths from GTF
+# Usage: ./transcript_lengths.awk annotation.gtf
+# (or: awk -f transcript_lengths.awk annotation.gtf)
+
+BEGIN { FS = "\t" }
+/^#/ { next }
+$3 == "exon" {
+    match($9, /transcript_id "([^"]+)"/, arr)
+    tx_len[arr[1]] += $5 - $4 + 1
+}
+END {
+    for (tx in tx_len) print tx, tx_len[tx]
+}
+```
+
+```bash
+chmod +x transcript_lengths.awk
+./transcript_lengths.awk annotation.gtf
+```
+
+**Using gawk explicitly:**
+
+```awk
+#!/usr/bin/env -S gawk -f
+# Only needed for scripts using gawk features (match 3-arg, gensub, etc.)
+```
+
+### File naming conventions
+
+| Extension | When to use |
+|---|---|
+| `.awk` | POSIX-compatible scripts (work with any AWK) |
+| `.gawk` | Scripts requiring GNU AWK features — makes the dependency explicit |
+
+Both are just text files — the extension is a convention, not enforced by AWK.
+
+### When to use a file vs a one-liner
+
+| Use a file when... | Use a one-liner when... |
+|---|---|
+| Script is > 3 lines | Quick filter, column extraction |
+| Script has functions | Ad-hoc exploration in the terminal |
+| Script is reused across projects | Pipe chain with other tools |
+| Script is called from Nextflow `bin/` | Throwaway data check |
+| Script needs to be tested independently | |
+| Script needs comments for future you | |
+
+### Multiple `-f` flags
+
+AWK can load multiple script files — useful for separating library functions from
+the main logic:
+
+```bash
+# Load a shared function library, then the main script
+awk -f lib/parse_gtf.awk -f count_exons.awk annotation.gtf
+```
+
+### Integration with Nextflow
+
+Storing AWK scripts in `.awk` files is the cleanest way to use AWK in Nextflow —
+it eliminates all quoting problems:
+
+```nextflow
+process FILTER_VCF {
+    input:  path vcf
+    output: path "filtered.vcf"
+    script:
+    """
+    awk -v min_qual=${params.min_qual} -f ${projectDir}/bin/filter_qual.awk ${vcf} > filtered.vcf
+    """
+}
+```
+
+No `\$` escaping, no triple-quoted strings, no confusion between Groovy and AWK
+variables. See [AWK in Nextflow](15-nextflow.md) for details.
+
+### Explanation
+
+- `-f script.awk` reads the AWK program from the file instead of the command line argument.
+- The shebang `#!/usr/bin/env -S awk -f` uses `env` to find `awk` in `$PATH`. The `-S`
+  flag (available on modern `env`) splits the arguments correctly.
+- Variables passed with `-v key=value` work the same way whether the program comes from
+  `-f` or the command line.
+- Comments (`# ...`) work in `.awk` files exactly as in inline programs.
+
+---
+
 ## Custom functions
 
 ### Context
