@@ -270,3 +270,9 @@ Be honest about the boundary:
         module load gawk   # or: which awk && awk --version
         # On most HPC systems, awk is already gawk
         ```
+
+## References
+
+- [GNU AWK manual](https://www.gnu.org/software/gawk/manual/gawk.html)
+- [POSIX AWK specification](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/awk.html)
+- [mawk — fast POSIX AWK](https://invisible-island.net/mawk/)

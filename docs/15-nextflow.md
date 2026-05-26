@@ -477,3 +477,8 @@ nextflow run main.nf ... -resume
         exit 1
     fi
     ```
+
+## References
+
+- [Nextflow documentation](https://www.nextflow.io/docs/latest/index.html)
+- [nf-core](https://nf-co.re/)

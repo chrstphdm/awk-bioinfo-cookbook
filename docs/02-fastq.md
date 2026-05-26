@@ -240,3 +240,7 @@ END {
             print "MISSING:", id > "/dev/stderr"
 }
 ```
+
+## References
+
+- [FASTQ format specification (NCBI)](https://www.ncbi.nlm.nih.gov/sra/docs/submitformats/#fastq)

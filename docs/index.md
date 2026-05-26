@@ -7,7 +7,7 @@ diagnostic sequencing pipelines in clinical labs to large-scale population genom
 projects. I'm [Christophe Demay](https://chrstphdm.github.io/), a senior
 bioinformatics consultant and workflow engineer. Over the years, I've maintained
 pipelines across 12+ clinical areas, built HLA typing workflows, and processed
-datasets of 40,000+ whole genomes.
+datasets of 40,000+ whole genomes and much more.
 
 AWK has been a constant throughout all of this. Not because it's trendy — but because
 when you need to filter a 50 GB VCF at 3 AM on an HPC node, AWK is already there,

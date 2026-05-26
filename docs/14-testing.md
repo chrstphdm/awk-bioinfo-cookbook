@@ -332,3 +332,7 @@ jobs:
       - run: pip install mkdocs-material
       - run: mkdocs gh-deploy --force
 ```
+
+## References
+
+- [bats-core — Bash Automated Testing System](https://github.com/bats-core/bats-core)

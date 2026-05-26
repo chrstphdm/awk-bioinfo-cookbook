@@ -484,3 +484,8 @@ END {
         print imp, impact[imp]
 }
 ```
+
+## References
+
+- [VCF specification v4.3 (hts-specs)](https://samtools.github.io/hts-specs/VCFv4.3.pdf)
+- [SnpEff documentation](https://pcingola.github.io/SnpEff/)

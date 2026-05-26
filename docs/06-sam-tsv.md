@@ -138,3 +138,8 @@ END {
 - `-a` flag in `samtools depth` includes zero-coverage positions; without it, uncovered
   bases are absent and breadth cannot be computed correctly.
 - `(bases - zero_cov) / bases * 100` gives the fraction of positions with at least 1x.
+
+## References
+
+- [SAM/BAM format specification (hts-specs)](https://samtools.github.io/hts-specs/SAMv1.pdf)
+- [samtools documentation](https://www.htslib.org/doc/samtools.html)

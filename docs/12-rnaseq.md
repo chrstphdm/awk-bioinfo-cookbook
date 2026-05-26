@@ -322,3 +322,8 @@ END {
            kept+0, total, (kept+0)/total*100 > "/dev/stderr"
 }
 ```
+
+## References
+
+- [HTSeq documentation](https://htseq.readthedocs.io/)
+- [Subread/featureCounts](https://subread.sourceforge.net/)

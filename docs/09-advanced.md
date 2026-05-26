@@ -319,3 +319,7 @@ Multiple exclusive conditions on the same variable. More readable than a chain o
     for reading from a file or command mid-script. It is essential for bidirectional
     pipelines, reading companion files without loading them into memory, and coprocesses.
     See [getline](10-getline.md).
+
+## References
+
+- [GNU AWK manual — Arrays](https://www.gnu.org/software/gawk/manual/gawk.html#Arrays)

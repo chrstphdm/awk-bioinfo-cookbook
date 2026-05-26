@@ -239,3 +239,8 @@ sort -k1,1 -k2,2n docs/data/regions.bed \
 - `if ($3 > end) end = $3` extends the current merged interval if the new one reaches
   further right.
 - The `END` block ensures the last accumulated interval is printed.
+
+## References
+
+- [BED format specification (UCSC)](https://genome.ucsc.edu/FAQ/FAQformat.html#format1)
+- [GFF3 specification](https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md)

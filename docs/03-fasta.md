@@ -240,3 +240,7 @@ awk '/^>/ { if (seq!="") print length(seq); seq=""; next } { seq=seq$0 } END { i
   | awk -v total=$(grep -v ">" assembly.fasta | tr -d '\n' | wc -c) \
         '{ cumul+=$1; if(cumul >= total/2) { print $1; exit } }'
 ```
+
+## References
+
+- [FASTA format description (NCBI)](https://www.ncbi.nlm.nih.gov/genbank/fastaformat/)

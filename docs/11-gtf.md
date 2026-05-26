@@ -378,3 +378,8 @@ END {
     for (bt in biotypes) print biotypes[bt], bt
 }
 ```
+
+## References
+
+- [Ensembl GTF/GFF format](https://www.ensembl.org/info/website/upload/gff.html)
+- [GENCODE data format](https://www.gencodegenes.org/pages/data_format.html)
