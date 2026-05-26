@@ -21,6 +21,8 @@ theme:
   features:
     - navigation.sections
     - navigation.top
+    - navigation.indexes
+    - toc.integrate
     - search.highlight
     - content.code.copy
 
@@ -30,11 +32,13 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
+  - pymdownx.details
   - tables
   - admonition
 
 nav:
   - Home: index.md
+  - Why AWK?: 00-why-awk.md
   - Fundamentals: 01-fundamentals.md
   - FASTQ: 02-fastq.md
   - FASTA: 03-fasta.md
@@ -44,3 +48,11 @@ nav:
   - Two-file Joins: 07-joins.md
   - Reports & Aggregation: 08-reports.md
   - Advanced Patterns: 09-advanced.md
+  - getline: 10-getline.md
+  - Testing AWK Scripts: 10-testing.md
+  - GTF Annotation: 11-gtf.md
+  - RNA-seq Counts: 12-rnaseq.md
+  - Multi-sample Patterns: 13-multi-sample.md
+  - AWK in Nextflow: 15-nextflow.md
+  - Workflows: 16-workflows.md
+  - Test Data: data/README.md
