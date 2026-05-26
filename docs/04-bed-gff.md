@@ -157,8 +157,10 @@ $3 == "gene" {
 
 ### Variants
 
+**[gawk]** — simpler with 3-argument `match()`:
+
 ```awk
-# Simpler: use match() to capture the value directly [gawk]
+BEGIN { FS = "\t" }
 /^#/ { next }
 $3 == "gene" {
     match($9, /gene_id "([^"]+)"/, arr)   # GTF-style quoted attribute
