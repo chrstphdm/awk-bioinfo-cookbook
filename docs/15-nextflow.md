@@ -241,21 +241,24 @@ process MERGE_MAPPING_STATS {
 
 ---
 
-## AWK in nf-core module style
+## AWK in nf-core modules — structure and `templates/`
 
 ### Context
 
-nf-core modules follow a standard structure: `main.nf` contains the process,
-`meta.yml` documents it. AWK often appears in the `script:` block for preprocessing
-or format conversion. The following illustrates the pattern — it is not copied from
-any existing nf-core module.
+nf-core modules follow a standard structure. For short AWK commands (1–5 lines),
+inline `script:` blocks are standard. For longer AWK programs, nf-core uses a
+`templates/` directory inside the module — this is the **current recommended approach**
+for non-trivial scripts.
 
-### Illustrative module structure
+All examples below are original and illustrative — not copied from nf-core repositories.
+
+### Module with inline AWK (short scripts)
 
 ```
 modules/local/vcf_qual_filter/
 ├── main.nf
-└── meta.yml
+├── meta.yml
+└── environment.yml
 ```
 
 ```nextflow
@@ -263,6 +266,7 @@ modules/local/vcf_qual_filter/
 process VCF_QUAL_FILTER {
     tag "$meta.id"
     label 'process_low'
+    conda "${moduleDir}/environment.yml"
 
     input:
     tuple val(meta), path(vcf)
@@ -272,7 +276,7 @@ process VCF_QUAL_FILTER {
     path "versions.yml"                    , emit: versions
 
     script:
-    def prefix  = task.ext.prefix ?: "${meta.id}"
+    def prefix   = task.ext.prefix ?: "${meta.id}"
     def min_qual = task.ext.args   ?: "30"
     """
     awk -v min_qual=${min_qual} \\
@@ -286,6 +290,99 @@ process VCF_QUAL_FILTER {
     """
 }
 ```
+
+### Module with `templates/` directory (complex scripts)
+
+When the AWK logic is > 5 lines, extract it into a `templates/` file. The `template`
+directive loads the script from a file relative to the module's directory:
+
+```
+modules/local/vcf_cohort_report/
+├── main.nf
+├── meta.yml
+├── environment.yml
+└── templates/
+    └── cohort_report.sh
+```
+
+```nextflow
+// modules/local/vcf_cohort_report/main.nf
+process VCF_COHORT_REPORT {
+    tag "$meta.id"
+    label 'process_low'
+    conda "${moduleDir}/environment.yml"
+
+    input:
+    tuple val(meta), path(vcf)
+
+    output:
+    tuple val(meta), path("*.report.tsv"), emit: report
+    path "versions.yml"                  , emit: versions
+
+    script:
+    def prefix = task.ext.prefix ?: "${meta.id}"
+    template 'cohort_report.sh'
+}
+```
+
+```bash
+#!/usr/bin/env bash
+# templates/cohort_report.sh
+# Nextflow variables (${prefix}, ${vcf}) are interpolated before execution.
+
+awk '
+/^#CHROM/ {
+    for (i=10; i<=NF; i++) samples[i] = \$i
+    n_samples = NF - 9; next
+}
+/^#/ { next }
+{
+    n_variants++
+    is_pass = (\$7 == "PASS")
+    n_fmt = split(\$9, fmt, ":")
+    gt_idx = 0
+    for (i=1; i<=n_fmt; i++) if (fmt[i]=="GT") { gt_idx=i; break }
+    for (s=10; s<=NF; s++) {
+        split(\$s, g, ":")
+        gt = gt_idx ? g[gt_idx] : "./."
+        if (gt == "./.") { missing[s]++ }
+        else { total[s]++; if (is_pass) pass_count[s]++ }
+    }
+}
+END {
+    for (s=10; s<=9+n_samples; s++)
+        printf "%s\\t%d\\t%.1f%%\\t%.1f%%\\n",
+            samples[s], total[s]+0,
+            (total[s]>0 ? pass_count[s]/total[s]*100 : 0),
+            (n_variants>0 ? (missing[s]+0)/n_variants*100 : 0)
+}' "${vcf}" > "${prefix}.report.tsv"
+
+cat <<-END_VERSIONS > versions.yml
+"${task.process}":
+    awk: \$(awk --version 2>&1 | head -1)
+END_VERSIONS
+```
+
+### How `template` and `moduleDir` work
+
+| Variable / directive | What it does |
+|---|---|
+| `template 'script.sh'` | Loads `templates/script.sh` relative to the module's `main.nf` |
+| `moduleDir` | Resolves to the directory containing the current module's `main.nf` |
+| `${moduleDir}/environment.yml` | Standard nf-core pattern for conda environment |
+
+- Inside a template file, Nextflow variables (`${prefix}`, `${vcf}`, `${task.cpus}`)
+  are interpolated **before** the script runs — exactly like an inline `script:` block.
+- AWK `$` field variables must still be escaped as `\$` inside templates (same as inline).
+- The template file must have a shebang (`#!/usr/bin/env bash`).
+
+### When to use each approach
+
+| Approach | When | AWK suitability |
+|---|---|---|
+| Inline `script:` | 1–5 line AWK one-liners | Most nf-core modules do this |
+| `templates/` directory | Complex scripts (> 5 lines) | Recommended — clean, testable, version-controlled alongside module |
+| `${projectDir}/bin/` + `-f` | Pipeline-specific scripts, not for shared modules | Legacy — still works for pipeline-level scripts |
 
 ### Explanation
 
