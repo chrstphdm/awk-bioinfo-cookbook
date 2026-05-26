@@ -311,3 +311,11 @@ Multiple exclusive conditions on the same variable. More readable than a chain o
 - `switch` is gawk-specific. POSIX equivalent: chain of `if/else if`.
 - `break` is required to prevent fall-through (same as C).
 - Cases can be strings, numbers, or regex: `case /^chr/: ...`
+
+---
+
+!!! note "See also: getline"
+    The next natural step after mastering these patterns is `getline` — AWK's facility
+    for reading from a file or command mid-script. It is essential for bidirectional
+    pipelines, reading companion files without loading them into memory, and coprocesses.
+    See [getline](10-getline.md).
