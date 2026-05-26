@@ -1,0 +1,21 @@
+##gff-version 3
+##sequence-region chr1 1 500
+##sequence-region chr2 1 200
+# Synthetic annotation for AWK bioinformatics cookbook examples
+chr1	ensembl	gene	1001	2500	.	+	.	ID=gene:GENE1;Name=GENE1;biotype=protein_coding
+chr1	ensembl	mRNA	1001	2500	.	+	.	ID=transcript:GENE1.1;Parent=gene:GENE1;Name=GENE1.1
+chr1	ensembl	exon	1001	1200	.	+	.	ID=exon:GENE1.1.1;Parent=transcript:GENE1.1;exon_number=1
+chr1	ensembl	CDS	1001	1200	.	+	0	ID=CDS:GENE1.1.1;Parent=transcript:GENE1.1
+chr1	ensembl	exon	1400	1600	.	+	.	ID=exon:GENE1.1.2;Parent=transcript:GENE1.1;exon_number=2
+chr1	ensembl	CDS	1400	1600	.	+	0	ID=CDS:GENE1.1.2;Parent=transcript:GENE1.1
+chr1	ensembl	exon	1800	2000	.	+	.	ID=exon:GENE1.1.3;Parent=transcript:GENE1.1;exon_number=3
+chr1	ensembl	CDS	1800	1950	.	+	0	ID=CDS:GENE1.1.3;Parent=transcript:GENE1.1
+chr1	ensembl	five_prime_UTR	1950	2000	.	+	.	ID=UTR5:GENE1.1;Parent=transcript:GENE1.1
+chr1	ensembl	three_prime_UTR	2200	2500	.	+	.	ID=UTR3:GENE1.1;Parent=transcript:GENE1.1
+chr2	ensembl	gene	500	1800	.	-	.	ID=gene:GENE2;Name=GENE2;biotype=protein_coding
+chr2	ensembl	mRNA	500	1800	.	-	.	ID=transcript:GENE2.1;Parent=gene:GENE2;Name=GENE2.1
+chr2	ensembl	exon	500	700	.	-	.	ID=exon:GENE2.1.1;Parent=transcript:GENE2.1;exon_number=1
+chr2	ensembl	CDS	500	700	.	-	0	ID=CDS:GENE2.1.1;Parent=transcript:GENE2.1
+chr2	ensembl	exon	900	1100	.	-	.	ID=exon:GENE2.1.2;Parent=transcript:GENE2.1;exon_number=2
+chr2	ensembl	CDS	900	1100	.	-	0	ID=CDS:GENE2.1.2;Parent=transcript:GENE2.1
+chr2	ensembl	three_prime_UTR	1400	1800	.	-	.	ID=UTR3:GENE2.1;Parent=transcript:GENE2.1

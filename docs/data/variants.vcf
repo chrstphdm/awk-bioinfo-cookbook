@@ -1,0 +1,34 @@
+##fileformat=VCFv4.2
+##reference=genome.fasta
+##contig=<ID=chr1,length=500>
+##contig=<ID=chr2,length=200>
+##FILTER=<ID=LowQual,Description="Low quality variant call">
+##FILTER=<ID=LowDepth,Description="Coverage below 10x">
+##INFO=<ID=AF,Number=A,Type=Float,Description="Allele frequency">
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Total read depth">
+##INFO=<ID=ANN,Number=.,Type=String,Description="Functional annotation (SnpEff)">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read depth">
+##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Genotype quality">
+##FORMAT=<ID=AD,Number=R,Type=Integer,Description="Allelic depths">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NA12878	NA19238	NA20585
+chr1	150	.	A	T	55	PASS	AF=0.33;DP=45;ANN=T|missense_variant|MODERATE|GENE1|GENE1|transcript|GENE1.1|protein_coding|1/3|c.50A>T|p.Lys17Asn	GT:DP:GQ:AD	0/1:15:48:10,5	0/0:16:50:16,0	0/1:14:45:9,5
+chr1	280	.	G	C	42	PASS	AF=0.17;DP=36;ANN=C|synonymous_variant|LOW|GENE1|GENE1|transcript|GENE1.1|protein_coding|1/3|c.130G>C|p.Ala44Ala	GT:DP:GQ:AD	0/0:12:50:12,0	0/1:13:40:10,3	0/0:11:48:11,0
+chr1	450	.	T	G	18	LowQual	AF=0.17;DP=18;ANN=G|intergenic_region|MODIFIER|.|.|intergenic_region|.|.|.|.|.	GT:DP:GQ:AD	0/0:6:30:6,0	0/0:7:35:7,0	0/1:5:20:3,2
+chr1	1050	.	C	T	68	PASS	AF=0.50;DP=60;ANN=T|missense_variant|MODERATE|GENE1|GENE1|transcript|GENE1.1|protein_coding|1/3|c.50C>T|p.Pro17Ser	GT:DP:GQ:AD	0/1:20:65:10,10	1/1:21:68:0,21	0/1:19:62:10,9
+chr1	1120	.	A	ATCG	72	PASS	AF=0.33;DP=54;ANN=ATCG|frameshift_variant|HIGH|GENE1|GENE1|transcript|GENE1.1|protein_coding|1/3|c.120_121insATCG|p.Tyr41fs	GT:DP:GQ:AD	0/1:18:70:10,8	0/0:18:72:18,0	0/1:18:68:10,8
+chr1	1450	.	GCTA	G	35	PASS	AF=0.17;DP=42;ANN=G|frameshift_variant|HIGH|GENE1|GENE1|transcript|GENE1.1|protein_coding|2/3|c.449_452delGCTA|p.Ala150fs	GT:DP:GQ:AD	0/0:14:55:14,0	0/1:14:33:10,4	0/0:14:50:14,0
+chr1	1600	.	T	C,A	48	PASS	AF=0.25,0.08;DP=48;ANN=C|missense_variant|MODERATE|GENE1|GENE1|transcript|GENE1.1|protein_coding|2/3|c.600T>C|p.Leu200Pro,A|missense_variant|MODERATE|GENE1|GENE1|transcript|GENE1.1|protein_coding|2/3|c.600T>A|p.Leu200Gln	GT:DP:GQ:AD	0/1:16:45:8,6,2	1/2:16:48:0,8,4	0/0:16:50:16,0,0
+chr1	1850	.	G	A	.	.	AF=0.08;DP=12;ANN=A|stop_gained|HIGH|GENE1|GENE1|transcript|GENE1.1|protein_coding|3/3|c.850G>A|p.Glu284*	GT:DP:GQ:AD	0/0:4:.	0/0:4:.	0/1:4:15:3,1
+chr1	2050	.	C	T	25	LowQual	AF=0.17;DP=24;ANN=T|downstream_gene_variant|MODIFIER|GENE1|GENE1|transcript|GENE1.1|protein_coding||c.*50C>T	GT:DP:GQ:AD	0/1:8:22:5,3	0/0:8:25:8,0	0/0:8:24:8,0
+chr2	520	.	A	G	80	PASS	AF=0.67;DP=72;ANN=G|missense_variant|MODERATE|GENE2|GENE2|transcript|GENE2.1|protein_coding|1/2|c.20A>G|p.Thr7Ala	GT:DP:GQ:AD	1/1:24:80:0,24	0/1:24:78:12,12	1/1:24:80:0,24
+chr2	610	.	G	T	55	PASS	AF=0.33;DP=54;ANN=T|synonymous_variant|LOW|GENE2|GENE2|transcript|GENE2.1|protein_coding|1/2|c.110G>T|p.Gly37Gly	GT:DP:GQ:AD	0/1:18:52:12,6	0/0:18:55:18,0	0/1:18:50:12,6
+chr2	680	.	TTAG	T	22	LowDepth	AF=0.08;DP=12;ANN=T|frameshift_variant|HIGH|GENE2|GENE2|transcript|GENE2.1|protein_coding|1/2|c.180_183delTTAG|p.Leu61fs	GT:DP:GQ:AD	0/0:4:25:4,0	0/1:4:20:2,2	0/0:4:22:4,0
+chr2	950	.	C	G,T	38	PASS	AF=0.33,0.17;DP=36;ANN=G|missense_variant|MODERATE|GENE2|GENE2|transcript|GENE2.1|protein_coding|2/2|c.451C>G|p.Arg151Gly,T|nonsense_variant|HIGH|GENE2|GENE2|transcript|GENE2.1|protein_coding|2/2|c.451C>T|p.Arg151*	GT:DP:GQ:AD	0/1:12:35:6,4,2	0/2:12:36:6,0,6	1/1:12:38:0,12,0
+chr2	1020	.	A	T	14	LowQual	AF=0.08;DP=12;ANN=T|intron_variant|MODIFIER|GENE2|GENE2|transcript|GENE2.1|protein_coding|1/1|c.399+20A>T	GT:DP:GQ:AD	0/0:4:20:4,0	0/0:4:18:4,0	0/1:4:14:3,1
+chr2	1100	.	T	C	92	PASS	AF=0.83;DP=72;ANN=C|missense_variant|MODERATE|GENE2|GENE2|transcript|GENE2.1|protein_coding|2/2|c.601T>C|p.Ser201Pro	GT:DP:GQ:AD	1/1:24:92:0,24	0/1:24:90:4,20	1/1:24:92:0,24
+chr2	1160	.	G	A	./.:LowDepth	AF=.;DP=5;ANN=A|splice_region_variant|LOW|GENE2|GENE2|transcript|GENE2.1|protein_coding|2/2|c.661+3G>A	GT:DP:GQ:AD	./.:2:.:.	./.:1:.:.	./.:2:.:.
+chr2	1250	.	C	T	45	PASS	AF=0.50;DP=48;ANN=T|upstream_gene_variant|MODIFIER|GENE2|GENE2|transcript|GENE2.1|protein_coding||c.-250C>T	GT:DP:GQ:AD	0/1:16:42:8,8	1/1:16:45:0,16	0/0:16:44:16,0
+chr2	1420	.	A	G	60	PASS	AF=0.33;DP=54;ANN=G|3_prime_UTR_variant|MODIFIER|GENE2|GENE2|transcript|GENE2.1|protein_coding|2/2|c.*20A>G	GT:DP:GQ:AD	0/0:18:58:18,0	0/1:18:60:12,6	0/1:18:58:12,6
+chr2	1600	.	T	A	35	LowQual	AF=0.17;DP=18	GT:DP:GQ:AD	0/1:6:32:4,2	0/0:6:34:6,0	0/0:6:30:6,0
+chr2	1750	.	G	C	50	PASS	AF=0.25;DP=36;ANN=C|intergenic_region|MODIFIER|.|.|intergenic_region|.|.|.|.|.	GT:DP:GQ:AD	0/0:12:50:12,0	0/1:12:48:9,3	0/0:12:46:12,0

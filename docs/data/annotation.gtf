@@ -1,0 +1,20 @@
+# Synthetic GTF for AWK bioinformatics cookbook examples
+# Ensembl-style: no chr prefix, gene_id/transcript_id quoted, gene_biotype attribute
+# GENCODE-style would use chr prefix and gene_type instead of gene_biotype
+chr1	ensembl	gene	1001	2500	.	+	.	gene_id "GENE1"; gene_name "GeneName1"; gene_biotype "protein_coding";
+chr1	ensembl	transcript	1001	2500	.	+	.	gene_id "GENE1"; transcript_id "GENE1.1"; gene_name "GeneName1"; transcript_biotype "protein_coding";
+chr1	ensembl	exon	1001	1200	.	+	.	gene_id "GENE1"; transcript_id "GENE1.1"; exon_number "1"; gene_name "GeneName1";
+chr1	ensembl	CDS	1001	1200	.	+	0	gene_id "GENE1"; transcript_id "GENE1.1"; exon_number "1"; gene_name "GeneName1";
+chr1	ensembl	exon	1400	1600	.	+	.	gene_id "GENE1"; transcript_id "GENE1.1"; exon_number "2"; gene_name "GeneName1";
+chr1	ensembl	CDS	1400	1600	.	+	0	gene_id "GENE1"; transcript_id "GENE1.1"; exon_number "2"; gene_name "GeneName1";
+chr1	ensembl	exon	1800	2000	.	+	.	gene_id "GENE1"; transcript_id "GENE1.1"; exon_number "3"; gene_name "GeneName1";
+chr1	ensembl	CDS	1800	1950	.	+	0	gene_id "GENE1"; transcript_id "GENE1.1"; exon_number "3"; gene_name "GeneName1";
+chr1	ensembl	UTR	1950	2000	.	+	.	gene_id "GENE1"; transcript_id "GENE1.1"; gene_name "GeneName1";
+chr1	ensembl	UTR	2200	2500	.	+	.	gene_id "GENE1"; transcript_id "GENE1.1"; gene_name "GeneName1";
+chr2	ensembl	gene	500	1800	.	-	.	gene_id "GENE2"; gene_name "GeneName2"; gene_biotype "protein_coding";
+chr2	ensembl	transcript	500	1800	.	-	.	gene_id "GENE2"; transcript_id "GENE2.1"; gene_name "GeneName2"; transcript_biotype "protein_coding";
+chr2	ensembl	exon	500	700	.	-	.	gene_id "GENE2"; transcript_id "GENE2.1"; exon_number "1"; gene_name "GeneName2";
+chr2	ensembl	CDS	500	700	.	-	0	gene_id "GENE2"; transcript_id "GENE2.1"; exon_number "1"; gene_name "GeneName2";
+chr2	ensembl	exon	900	1100	.	-	.	gene_id "GENE2"; transcript_id "GENE2.1"; exon_number "2"; gene_name "GeneName2";
+chr2	ensembl	CDS	900	1100	.	-	0	gene_id "GENE2"; transcript_id "GENE2.1"; exon_number "2"; gene_name "GeneName2";
+chr2	ensembl	UTR	1400	1800	.	-	.	gene_id "GENE2"; transcript_id "GENE2.1"; gene_name "GeneName2";
